@@ -8,18 +8,59 @@ use Date::Parse qw(str2time);
 use JSON;
 use LWP::UserAgent;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
-=item new
+=head1 NAME
+
+WWW::InstaMapper - Interface to the InstaMapper.com API
+
+=head1 SYNOPSIS
+
+  use WWW::InstaMapper;
+
+  my $instamapper = WWW::InstaMapper->new(
+      api_key => '1234567890',
+      ssl     => 1,
+  );
+
+  my $position = $instamapper->get_last_position;
+  print "Last position logged at $position->{timestamp}";
+
+  my @positions = $instamapper->get_positions(
+      num            => 500,
+      from_timestamp => '2009-01-01',
+  );
+
+  for my $position (@positions)
+  {
+    print "$position->{device_label} was at lat " .
+          "$position->{latitude}/long $position->{longitude} " .
+          "at $position->{timestamp}";
+  }
+
+=head1 DESCRIPTION
+
+This module provides an object-oriented Perl interface to the InstaMapper.com API.
+
+=head1 METHODS
+
+=head2 new
 
 Returns a new instance of WWW::InstaMapper.
 
 Accepts a hash, containing the following parameters:
 
-api_key (required): The InstaMapper API key (as a string) or multiple keys (as
-an array reference of strings) that you would like to retrieve positions for.
+=over 4
 
-ssl (optional): Boolean indication of whether or not to make API calls via HTTPS.
+=item * B<api_key> (required)
+
+The InstaMapper API key (as a string) or multiple keys (as an array reference of strings) that you would like to retrieve positions for.
+
+=item * B<ssl> (optional)
+
+Boolean indication of whether or not to make API calls via HTTPS.
+
+=back
 
 Please note that in accordance with the InstaMapper API terms, a delay of 10
 seconds (or 30 seconds if using SSL) will be enforced between requests via this
@@ -43,20 +84,55 @@ whose API keys are associated with this object.
 
 Accepts the following optional parameters:
 
-num - The number of positions to return (maximum of 1000)
-from_timestamp - Timestamp of the earliest time you would like positions from
-from_unixtime - Epoch timestamp (UTC) of the earliest time you would like positions from
+=over 4
+
+=item * B<num>
+
+The number of positions to return (maximum of 1000)
+
+=item * B<from_timestamp>
+
+Timestamp of the earliest time you would like positions from
+
+=item * B<from_unixtime>
+
+Epoch timestamp (UTC) of the earliest time you would like positions from
+
+=back
 
 The hash references contain the following data:
 
-device_key:   InstaMapper device key
-device_label: InstaMapper device label
-timestamp:    DateTime object representing the time the position was logged, in UTC
-latitude:     Latitude
-longitude:    Longitude
-altitude:     Altitude (in meters)
-speed:        Speed (in meters/second)
-heading:      Heading (in degrees)
+=over 4
+
+=item * B<device_key>
+
+InstaMapper device key
+
+=item * B<device_label>
+
+InstaMapper device label
+
+=item * B<timestamp>
+
+DateTime object representing the time the position was logged, in UTC
+
+=item * B<latitude>
+
+=item * B<longitude>
+
+=item * B<altitude>
+
+Altitude (in meters)
+
+=item * B<speed>
+
+Speed (in meters/second)
+
+=item * B<heading>
+
+Heading (in degrees)
+
+=back
 
 =cut
 
@@ -66,7 +142,7 @@ sub get_positions
     $self->_api_call('getPositions', @_);
 }
 
-=head2 $self->get_last_position
+=head2 get_last_position
 
 Returns a hash reference containing data on the last position logged for the
 devices whose API keys are associated with this object.
@@ -163,40 +239,6 @@ sub _enforce_terms
     sleep $requirement - $difference;
 }
 
-1;
-
-=head1 NAME
-
-WWW::InstaMapper - Perl interface to the InstaMapper.com API
-
-=head1 SYNOPSIS
-
-  use WWW::InstaMapper;
-
-  my $instamapper = WWW::InstaMapper->new(
-      api_key => '1234567890',
-      ssl     => 1,
-  );
-
-  my $position = $instamapper->get_last_position;
-  print "Last position logged at $position->{timestamp}";
-
-  my @positions = $instamapper->get_positions(
-      num            => 500,
-      from_timestamp => '2009-01-01',
-  );
-
-  for my $position (@positions)
-  {
-    print "$position->{device_label} was at lat " .
-          "$position->{latitude}/long $position->{longitude} " .
-          "at $position->{timestamp}";
-  }
-
-=head1 DESCRIPTION
-
-This module provides an object-oriented Perl interface to the InstaMapper.com API.
-
 =head1 DEPENDENCIES
 
 DateTime, Date::Parse, LWP::UserAgent, JSON
@@ -209,7 +251,7 @@ Users of this module must be sure to follow the InstaMapper.com API terms of ser
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008 Michael Aquilina. All rights reserved.
+Copyright (C) 2011 Michael Aquilina. All rights reserved.
 
 This code is free software; you can redistribute it and/or modify it under the same terms as Perl
 itself.
@@ -219,3 +261,5 @@ itself.
 Michael Aquilina, aquilina@cpan.org
 
 =cut
+
+1;
